@@ -43,9 +43,11 @@ void pachube_in_out(){
       // inputs, etc. . i also like to keep track of successful and failed connection
       // attempts, sometimes useful for determining whether there are major problems.
 
-//      sprintf(pachube_data,"%d,%d,%d,%d,%d,%d,%d,%d",analogRead(0),analogRead(1),analogRead(2),analogRead(3),analogRead(4),analogRead(5), successes + 1, failures);
-      sprintf(pachube_data,"%d,%d,%d",analogRead(0),analogRead(1),analogRead(2));
-      // sprintf writes into the pachube array data formatted as instructed between "", it contains as many arguments after the format stipulation included in it
+      sprintf(pachube_data,"%d,%d",analogRead(0),analogRead(1)); // 
+      // sprintf definition: this function writes into the pachube array data formatted as instructed between "", the number of inputs in the format needs to match the number of arguments after the format
+      // e.g. sprintf(pachube_data,"%d,%d,%d,%d,%d,%d,%d,%d",analogRead(0),analogRead(1),analogRead(2),analogRead(3),analogRead(4),analogRead(5), successes + 1, failures);
+
+      // determine the number of data elements that will be sent to Pachube
       content_length = strlen(pachube_data);
 
       Serial.print("data read ");
@@ -62,31 +64,27 @@ void pachube_in_out(){
 
       Serial.println("no GET request sent");
       Serial.print(millis());
-      Serial.print("PUT, to update");      
-      Serial.println(content_length);
+      Serial.println(" PUT, to update");      
 
       localClient.print("PUT /api/");
       localClient.print(SHARE_FEED_ID);
       localClient.print(".csv HTTP/1.1\nHost: pachube.com\nX-PachubeApiKey: ");
       localClient.print(PACHUBE_API_KEY);
-
       localClient.print("\nUser-Agent: Arduino (Pachube In Out v1.1)");
       localClient.print("\nContent-Type: text/csv\nContent-Length: ");
       localClient.print(content_length);
       localClient.print("\nConnection: close\n\n");
       localClient.print(pachube_data);
-
       localClient.print("\n");
 
-      ready_to_update = false;
-      reading_pachube = true;
-      request_pause = false;
-      interval = UPDATE_INTERVAL;
-
-      // Serial.print("finished PUT: ");
-      // Serial.println(millis());
+      // tell Arduino that
+      reading_pachube = true;           // it is time to read data from Pachube
+      ready_to_update = false;          // it is not yet time to make a new request or post new data to Pachube
+      request_pause = false;            // it is not time to start the pause countdown
+      interval = UPDATE_INTERVAL;       // reset the interval time
 
     } 
+    // if Arduino was not able to connect to Pachube then reset all variables and try again after interval time has passed
     else {
       Serial.print("connection failed!");
       Serial.print(++failures);
@@ -99,20 +97,20 @@ void pachube_in_out(){
       last_connect = millis();
       interval = RESET_INTERVAL;
       setupEthernet();
-    }
-  }
+    } // END ELSE STATEMENT
+  } // END IF ready_to_update STATEMENT
 
+  // if request to Pachube has been sent then
   while (reading_pachube){
-    while (localClient.available()) {
-      checkForResponse();
-    } 
+    // check whether data is available to be read, and call the checkForResponse function if data exists
+    while (localClient.available()) { checkForResponse(); } 
+    // check whether available data has been read (localClient.connected() is set to false once all data has been read), then call disconnect_pachube() function
+    if (!localClient.connected()) { disconnect_pachube(); }
+  } // END WHILE LOOP
+  
+} // END FUNCTION
 
-    if (!localClient.connected()) {
-      disconnect_pachube();
-    }
-  } 
-}
-
+// re-initialize variables to begin pause countdown until the next request and post cycle
 void disconnect_pachube(){
   Serial.println("disconnecting.\n=====\n\n");
   localClient.stop();
@@ -124,7 +122,7 @@ void disconnect_pachube(){
   resetEthernetShield();
 }
 
-
+// read data from the ethernet port 
 void checkForResponse(){  
   char c = localClient.read();
   //Serial.print(c);
