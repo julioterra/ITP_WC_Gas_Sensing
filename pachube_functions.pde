@@ -37,6 +37,8 @@ void pachube_in_out(){
   if (ready_to_update){
     Serial.println("Connecting...");
     dataSent = true;
+
+    // check if connection to pachube was successful
     if (localClient.connect()) {
 
       // here we assign comma-separated values to 'data', which will update Pachube datastreams
@@ -44,8 +46,8 @@ void pachube_in_out(){
       // inputs, etc. . i also like to keep track of successful and failed connection
       // attempts, sometimes useful for determining whether there are major problems.
 
-      sprintf(pachube_data,"%d,%d",avgSensors(0),avgSensors(1));
-      content_length = strlen(pachube_data);
+      sprintf(pachube_data,"%d,%d",avgSensors(0),avgSensors(1));      // reads data into char array identified, data should match format outlined
+      content_length = strlen(pachube_data);                          // determine length of actual used spaces in char array
 
 //      Serial.println("GET request to retrieve");
 
@@ -71,6 +73,7 @@ void pachube_in_out(){
 
       localClient.print("\n");
 
+      // set boolean variables to move sketch to next phase.
       ready_to_update = false;
       reading_pachube = true;
       request_pause = false;
@@ -80,6 +83,8 @@ void pachube_in_out(){
       // Serial.println(millis());
 
     } 
+
+    // if connection to pachube was not successful
     else {
       Serial.print("connection failed!");
       Serial.print(++failures);

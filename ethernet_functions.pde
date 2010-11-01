@@ -17,6 +17,7 @@ void clean_buffer() {
   memset(buff,0,sizeof(buff));     // memset clears the array buff, and keeps the size unchanged
 }
 
+// begin ethernet connection using IP and MAC address
 void resetEthernetShield(){
   Serial.println("reset ethernet");
   Ethernet.begin(mac, ip);

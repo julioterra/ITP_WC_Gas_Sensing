@@ -1,18 +1,17 @@
 #include <SPI.h>
 
 /* ==============================
- * This code, which assumes you're using the official Arduino Ethernet shield,
- * updates a Pachube feed with your analog-in values and grabs values from a Pachube
- * feed - basically it enables you to have both "local" and "remote" sensors.
- * 
- * Tested with Arduino 14
+ * ITP WC - GAS SENSOR READINGS
+ *
+ * This code was developed based on a template provided by pachube. It was created
+ * for a project titled ITP WC, that is being developed by Adib Dada, Julio Terra,
+ * Macaulay Campbel and Marko Marinquez.
+ *
+ * This code was adapted by Julio Terra.
  *
  * Pachube is www.pachube.com - connect, tag and share real time sensor data
  * code by usman (www.haque.co.uk), may 2009
  * copy, distribute, whatever, as you like.
- *
- * v1.1 - added User-Agent & fixed HTTP parser for new Pachube headers
- * and check millis() for when it wraps around
  *
  * =============================== */
 
@@ -53,73 +52,24 @@ void setup()
 {
   Serial.begin(57600); 
   setupEthernet(); 
-  
+ 
+  // initialize the sensorData array 
   for (int i = 0; i < numberOfSensors; i++) {
     for (int j = 0; j < numberOfReadings; j++) { sensorData[i][j] = 0; }
   }    
-
 }
 
 void loop()
 {
-  pachube_in_out();
+  // send data from pachube
+  pachube_in_out();        
+
+  // read data from sensors if appropriate interval has passed  
   if (readTime() == true) {
-      dataSent = initCounter(dataSent);
-      readSensors();
+      dataSent = initCounter(dataSent);    // re-init counter when dataSent flag is set to true (re-initialize dataSent flag)
+      readSensors();                       // read sensors
   }
 }
 
-
-boolean readTime() {
-//    Serial.println(previousRead);
-  if (millis() - previousRead > readInterval) { 
-    previousRead = millis();
-    return true; 
-  }
-  return false; 
-}
-
-// INIT COUNTER: checks if data has been uploaded and re-initializes the counters for each sensor
-boolean initCounter(boolean initFlag) {
-  if(initFlag) 
-      { for (int i = 0; i < numberOfSensors; i++) sensorCounter[i] = 0; }
-  return false;
-}
-
-
-// READ SENSORS: reads the latest data from each sensor into an array
-void readSensors() {
-  for (int i = 0; i < numberOfSensors; i++) { 
-      sensorData[i][sensorCounter[i]] = analogRead(sensorPin[i]);
-      sensorCounter[i]++; 
-      if (sensorCounter[i] >= (numberOfReadings - 1)) sensorCounter[i] = (numberOfReadings - 1);
-      
-      Serial.print("sensor ");
-      Serial.print(i);
-      Serial.print(" counter ");
-      Serial.print(sensorCounter[i]);
-      Serial.print(": ");
-      Serial.println(sensorData[i][sensorCounter[i]]);
-  } 
-}
-
-// AVERAGE SENSORS: averages the v
-int avgSensors(int sensorNum) {
-     long sumAverage = 0;
-     for (int i = 0; i < sensorCounter[sensorNum]; i++) 
-         { sumAverage = sensorData[sensorNum][i] + sumAverage; } 
-     int average = sumAverage / sensorCounter[sensorNum];
-
-     Serial.print("sum ");
-     Serial.print(sumAverage);
-     Serial.print(" counter ");
-     Serial.print(sensorCounter[sensorNum]);
-     Serial.print(" average sensor ");
-     Serial.print(sensorNum);
-     Serial.print(": ");
-     Serial.println(average);
-
-     return average;
-}
 
 
