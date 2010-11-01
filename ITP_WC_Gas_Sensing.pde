@@ -29,14 +29,23 @@
 #define REMOTE_FEED_ID             256      // this is the ID of the remote Pachube feed that you want to connect to
 #define REMOTE_FEED_DATASTREAMS    4        // make sure that remoteSensor array is big enough to fit all the remote data streams
 
-#define UPDATE_INTERVAL            60000    // if the connection is good wait 10 seconds before updating again - should not be less than 5
+#define UPDATE_INTERVAL            40000    // if the connection is good wait 10 seconds before updating again - should not be less than 5
 #define RESET_INTERVAL             10000    // if connection fails/resets wait 10 seconds before trying again - should not be less than 5
 
 #define PACHUBE_API_KEY            "338dcc0b7a0694cbc34f53416fa5b64355f143760a16ef856f7b68467afab32f" // fill in your API key 
+#define numberOfSensors             2
+#define numberOfReadings            200
 
 byte mac[] = { 0x02, 0xAA, 0xBB, 0xCC, 0x00, 0x11 };   // make sure this is unique on your network
 byte ip[] = { 128, 122, 151, 22 };                     // no DHCP so we set our own IP address
 byte remoteServer[] = { 209,40,205,190 };              // pachube.com
+
+int sensorPin[numberOfSensors] = {0,1};
+int sensorData[numberOfSensors][numberOfReadings];
+int sensorCounter[numberOfSensors] = {0,0};
+boolean dataSent = true;
+unsigned long readInterval = 350;
+unsigned long previousRead = 0;
 
 float remoteSensor[REMOTE_FEED_DATASTREAMS];        // we know that feed 256 has floats - this might need changing for feeds without floats
 
@@ -44,36 +53,73 @@ void setup()
 {
   Serial.begin(57600); 
   setupEthernet(); 
+  
+  for (int i = 0; i < numberOfSensors; i++) {
+    for (int j = 0; j < numberOfReadings; j++) { sensorData[i][j] = 0; }
+  }    
 
-  pinMode(3, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
 }
 
 void loop()
 {
-
-  // call 'pachube_in_out' at the beginning of the loop, handles timing, requesting
-  // and reading. use serial monitor to view debug messages
-
   pachube_in_out();
-
-  // then put your code here, you can access remote sensor values
-  // by using the remoteSensor float array, e.g.: 
-
-  analogWrite(3, (int)remoteSensor[3] * 10); // remoteSensor is a float
-  analogWrite(5, (int)remoteSensor[1]); 
-
-  // you can have code that is time sensitive (e.g. using 'delay'), but 
-  // be aware that it will be affected by a short pause during connecting
-  // to and reading from ethernet (approx. 0.5 to 1 sec).
-  // e.g. this code should carry on flashing regularly, with brief pauses
-  // every few seconds during Pachube update.
-
-  digitalWrite(6, HIGH);
-  delay(100);
-  digitalWrite(6, LOW);
-  delay(100);
-
+  if (readTime() == true) {
+      dataSent = initCounter(dataSent);
+      readSensors();
+  }
 }
+
+
+boolean readTime() {
+//    Serial.println(previousRead);
+  if (millis() - previousRead > readInterval) { 
+    previousRead = millis();
+    return true; 
+  }
+  return false; 
+}
+
+// INIT COUNTER: checks if data has been uploaded and re-initializes the counters for each sensor
+boolean initCounter(boolean initFlag) {
+  if(initFlag) 
+      { for (int i = 0; i < numberOfSensors; i++) sensorCounter[i] = 0; }
+  return false;
+}
+
+
+// READ SENSORS: reads the latest data from each sensor into an array
+void readSensors() {
+  for (int i = 0; i < numberOfSensors; i++) { 
+      sensorData[i][sensorCounter[i]] = analogRead(sensorPin[i]);
+      sensorCounter[i]++; 
+      if (sensorCounter[i] >= (numberOfReadings - 1)) sensorCounter[i] = (numberOfReadings - 1);
+      
+      Serial.print("sensor ");
+      Serial.print(i);
+      Serial.print(" counter ");
+      Serial.print(sensorCounter[i]);
+      Serial.print(": ");
+      Serial.println(sensorData[i][sensorCounter[i]]);
+  } 
+}
+
+// AVERAGE SENSORS: averages the v
+int avgSensors(int sensorNum) {
+     long sumAverage = 0;
+     for (int i = 0; i < sensorCounter[sensorNum]; i++) 
+         { sumAverage = sensorData[sensorNum][i] + sumAverage; } 
+     int average = sumAverage / sensorCounter[sensorNum];
+
+     Serial.print("sum ");
+     Serial.print(sumAverage);
+     Serial.print(" counter ");
+     Serial.print(sensorCounter[sensorNum]);
+     Serial.print(" average sensor ");
+     Serial.print(sensorNum);
+     Serial.print(": ");
+     Serial.println(average);
+
+     return average;
+}
+
 
