@@ -46,7 +46,7 @@ void pachube_in_out(){
       // inputs, etc. . i also like to keep track of successful and failed connection
       // attempts, sometimes useful for determining whether there are major problems.
 
-      sprintf(pachube_data,"%d,%d",avgSensors(0),avgSensors(1));      // reads data into char array identified, data should match format outlined
+      sprintf(pachube_data,"%d, %d, %d", avgVOCsensor(), avgMethaneSensor(), avgCOSensor());      // reads data into char array identified, data should match format outlined
       content_length = strlen(pachube_data);                          // determine length of actual used spaces in char array
 
 //      Serial.println("GET request to retrieve");

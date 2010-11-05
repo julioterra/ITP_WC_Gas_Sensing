@@ -1,6 +1,5 @@
 Client localClient(remoteServer, 80);      // sets up the arduino as a client of the pachube server
-unsigned int interval;                     // 
-
+unsigned int interval;                     
 char buff[64];
 int pointer = 0;
 
@@ -14,7 +13,7 @@ void setupEthernet() {
 
 void clean_buffer() {
   pointer = 0;
-  memset(buff,0,sizeof(buff));     // memset clears the array buff, and keeps the size unchanged
+  memset(buff,0,sizeof(buff));             // memset clears the array buff, and keeps the size unchanged
 }
 
 // begin ethernet connection using IP and MAC address
