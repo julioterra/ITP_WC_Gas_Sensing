@@ -15,7 +15,7 @@
 #define PACHUBE_API_KEY            "338dcc0b7a0694cbc34f53416fa5b64355f143760a16ef856f7b68467afab32f" // fill in your API key 
 #define numberOfSensors             2
 #define numberOfReadings            200
-#define methaneCONumberofReadings   40
+#define methaneCONumberofReadings   100
 #define methaneCOCycles             6
 
 byte mac[] = { 0x02, 0xAA, 0xBB, 0xCC, 0x00, 0x11 };   // make sure this is unique on your network
@@ -27,12 +27,12 @@ int methaneValues[methaneCONumberofReadings];          // array for methane sens
 int methaneCounter;                                    // counter for methane readings
 int COValues[methaneCONumberofReadings];               // array for CO sensor values
 int COCounter;                                         // counter for CO readings
-int methaneCOpreviousCycleTime;                        // variable to save the time when the cycles change
+unsigned long methaneCOpreviousCycleTime;                        // variable to save the time when the cycles change
 int methaneCOCycleIndex;                               // variable that holds current cycle phase
 
 // array that holds the voltage setting and time for each cycle phase
-int methaneCOReadTimeCycle[methaneCOCycles] = {14985, 5, 10, 4985, 5, 10};
-int methaneCOHeatLevel[methaneCOCycles] = {5, 5, 5, 45, 45, 45};
+long methaneCOReadTimeCycle[methaneCOCycles] = {14985, 5, 10, 4985, 5, 10};
+int methaneCOHeatLevel[methaneCOCycles] = {10, 10, 10, 45, 45, 45};
 
 int vocPin = 0;                                         // pin for analogRead of VOC sensors
 int vocValues[numberOfReadings];                        // array for VOC sensor values
