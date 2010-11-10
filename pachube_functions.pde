@@ -81,7 +81,6 @@ void pachube_in_out(){
 
       // Serial.print("finished PUT: ");
       // Serial.println(millis());
-
     } 
 
     // if connection to pachube was not successful
@@ -97,8 +96,9 @@ void pachube_in_out(){
       last_connect = millis();
       interval = RESET_INTERVAL;
       setupEthernet();
-    }
-  }
+    } // end if connection not successful code
+    
+  } // end ready to update if statement
 
   while (reading_pachube){
     while (localClient.available()) {

@@ -27,7 +27,7 @@ int methaneValues[methaneCONumberofReadings];          // array for methane sens
 int methaneCounter;                                    // counter for methane readings
 int COValues[methaneCONumberofReadings];               // array for CO sensor values
 int COCounter;                                         // counter for CO readings
-unsigned long methaneCOpreviousCycleTime;                        // variable to save the time when the cycles change
+unsigned long methaneCOpreviousCycleTime;              // variable to save the time when the cycles change
 int methaneCOCycleIndex;                               // variable that holds current cycle phase
 
 // array that holds the voltage setting and time for each cycle phase

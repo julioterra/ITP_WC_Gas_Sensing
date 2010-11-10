@@ -34,23 +34,26 @@ void updateMethaneOCHeater() {
 void readMethaneCOSensors() {  
     if (methaneCOCycleIndex == 1) {                                      // if current cycle phase is 1
         COValues[COCounter] = analogRead(methaneCOHeaterPin);                // read CO value into array and update counter
-        COCounter++; 
-        if (COCounter >= (methaneCONumberofReadings - 1)) COCounter = (methaneCONumberofReadings - 1);
         
         Serial.print(" CO counter: ");
         Serial.print(COCounter);
         Serial.print(" and values: ");
         Serial.println(COValues[COCounter]); 
 
+        COCounter++; 
+        if (COCounter >= (methaneCONumberofReadings - 1)) COCounter = (methaneCONumberofReadings - 1);
+
     } else if (methaneCOCycleIndex == 4) {                               // if current cycle phase is 4
         methaneValues[COCounter] = analogRead(methaneCOHeaterPin);           // read methane value into array and update counter
-        methaneCounter++;     
-        if (methaneCounter >= (methaneCONumberofReadings - 1)) methaneCounter = (methaneCONumberofReadings - 1);
 
         Serial.print(" Methane counter ");
         Serial.print(methaneCounter);
         Serial.print(" and values: ");
         Serial.println(methaneValues[COCounter]); 
+
+        methaneCounter++;     
+        if (methaneCounter >= (methaneCONumberofReadings - 1)) methaneCounter = (methaneCONumberofReadings - 1);
+        
     }
 }
 
@@ -63,8 +66,6 @@ void readVOCSensors() {
         previousRead = millis();
 
         vocValues[vocCounter] = analogRead(vocPin);
-        vocCounter++; 
-        if (vocCounter >= (numberOfReadings - 1)) vocCounter = (numberOfReadings - 1);
         
         Serial.print("time ");
         Serial.print(millis());
@@ -72,6 +73,10 @@ void readVOCSensors() {
         Serial.print(vocCounter);
         Serial.print(" and values: ");
         Serial.println(vocValues[vocCounter]); 
+
+        vocCounter++; 
+        if (vocCounter >= (numberOfReadings - 1)) vocCounter = (numberOfReadings - 1);
+
     }
 }
 
