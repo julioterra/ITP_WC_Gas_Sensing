@@ -13,7 +13,6 @@
 #define RESET_INTERVAL             10000    // if connection fails/resets wait 10 seconds before trying again - should not be less than 5
 
 #define PACHUBE_API_KEY            "338dcc0b7a0694cbc34f53416fa5b64355f143760a16ef856f7b68467afab32f" // fill in your API key 
-#define numberOfSensors             2
 #define numberOfReadings            200
 #define methaneCONumberofReadings   100
 #define methaneCOCycles             6
@@ -43,16 +42,19 @@ boolean dataSent = true;
 
 float remoteSensor[REMOTE_FEED_DATASTREAMS];        // we know that feed 256 has floats - this might need changing for feeds without floats
 
-void setup()
-{
+void setup() {
     Serial.begin(57600); 
     setupEthernet(); 
-  
+
     pinMode(methaneCOHeaterPin, OUTPUT);
+    
+    // initialize variables for reading data from methaneCO sensors
     methaneCOCycleIndex = 0;
     methaneCOpreviousCycleTime = millis();
     methaneCounter = 0;
     COCounter = 0;
+
+    // set the appropriate voltage for methane/CO heater 
     analogWrite(methaneCOHeaterPin, methaneCOHeatLevel[methaneCOCycleIndex]);
    
     // initialize the sensorData array 
@@ -65,16 +67,11 @@ void setup()
 
 
 
-void loop()
-{
-    // send data from pachube
-    pachube_in_out();    
-    // adjust voltage to heater from methane sensor  
-    updateMethaneOCHeater();
-    // read sensors
-    readMethaneCOSensors();
+void loop() {
+    pachube_in_out();           // send data from pachube 
+    updateMethaneOCHeater();    // adjust voltage to heater from methane sensor 
+    readMethaneCOSensors();     // read sensors
     readVOCSensors();                       
 }
-
 
 

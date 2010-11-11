@@ -5,7 +5,7 @@ int pointer = 0;
 
 void setupEthernet() {
   resetEthernetShield();
-  Client remoteClient(255);                // creates a second client using port 255 of remote server 
+//  Client remoteClient(255);                // creates a second client using port 255 of remote server 
   delay(500);
   interval = UPDATE_INTERVAL;
   Serial.println("setup complete");

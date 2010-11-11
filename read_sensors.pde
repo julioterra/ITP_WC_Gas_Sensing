@@ -44,12 +44,12 @@ void readMethaneCOSensors() {
         if (COCounter >= (methaneCONumberofReadings - 1)) COCounter = (methaneCONumberofReadings - 1);
 
     } else if (methaneCOCycleIndex == 4) {                               // if current cycle phase is 4
-        methaneValues[COCounter] = analogRead(methaneCOHeaterPin);           // read methane value into array and update counter
+        methaneValues[methaneCounter] = analogRead(methaneCOHeaterPin);           // read methane value into array and update counter
 
         Serial.print(" Methane counter ");
         Serial.print(methaneCounter);
         Serial.print(" and values: ");
-        Serial.println(methaneValues[COCounter]); 
+        Serial.println(methaneValues[methaneCounter]); 
 
         methaneCounter++;     
         if (methaneCounter >= (methaneCONumberofReadings - 1)) methaneCounter = (methaneCONumberofReadings - 1);
